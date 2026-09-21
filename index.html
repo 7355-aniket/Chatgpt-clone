@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatGPT</title>
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Söhne:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Highlight.js CSS for code blocks -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+
+  <!-- Application CSS -->
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="dark-theme">
+  <div class="app-container">
+    
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <button class="new-chat-btn" id="newChatBtn">
+          <i class="fa-solid fa-plus"></i>
+          <span>New chat</span>
+        </button>
+        <button class="icon-btn mobile-close-btn" id="closeSidebarBtn">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="chat-history-container" id="chatHistoryContainer">
+        <div class="history-section-title">Recent Chats</div>
+        <div class="chat-history-list" id="chatHistoryList">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="sidebar-item-btn" id="clearChatsBtn">
+          <i class="fa-regular fa-trash-can"></i>
+          <span>Clear conversations</span>
+        </button>
+        <button class="sidebar-item-btn" id="openSettingsBtn">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings & API Keys</span>
+        </button>
+        <div class="user-profile">
+          <div class="user-avatar">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div class="user-info">
+            <span class="user-name">User Account</span>
+            <span class="user-plan">Free Plan</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="left-header-controls">
+          <button class="icon-btn sidebar-toggle-btn" id="toggleSidebarBtn" title="Toggle Sidebar">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          
+          <div class="model-selector-dropdown">
+            <button class="model-selector-btn" id="modelSelectorBtn">
+              <span class="model-icon"><i class="fa-solid fa-bolt text-green"></i></span>
+              <span class="model-name" id="currentModelLabel">ChatGPT 4.0 Mini (Built-in)</span>
+              <i class="fa-solid fa-chevron-down arrow-icon"></i>
+            </button>
+            <div class="model-menu hidden" id="modelMenu">
+              <div class="model-option selected" data-model="smart-ai" data-label="ChatGPT 4.0 Mini (Built-in)">
+                <div class="model-option-header">
+                  <i class="fa-solid fa-bolt text-green"></i>
+                  <span>ChatGPT 4.0 Mini (Built-in)</span>
+                </div>
+                <div class="model-option-desc">Fast, responsive & smart built-in engine. No API key needed.</div>
+              </div>
+              <div class="model-option" data-model="gpt-4o" data-label="GPT-4o (OpenAI API)">
+                <div class="model-option-header">
+                  <i class="fa-solid fa-wand-magic-sparkles text-purple"></i>
+                  <span>GPT-4o (OpenAI Live)</span>
+                </div>
+                <div class="model-option-desc">Requires OpenAI API key in Settings.</div>
+              </div>
+              <div class="model-option" data-model="gemini-pro" data-label="Gemini 1.5 Pro (Google API)">
+                <div class="model-option-header">
+                  <i class="fa-solid fa-gem text-blue"></i>
+                  <span>Gemini 1.5 Pro (Google Live)</span>
+                </div>
+                <div class="model-option-desc">Requires Gemini API key in Settings.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-header-controls">
+          <button class="icon-btn" id="themeToggleBtn" title="Toggle Theme">
+            <i class="fa-regular fa-moon" id="themeIcon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Chat View Area -->
+      <div class="chat-viewport" id="chatViewport">
+        
+        <!-- Welcome Screen (Shown when chat is empty) -->
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="welcome-logo">
+            <div class="gpt-badge-icon">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+          </div>
+          <h1 class="welcome-title">Where knowledge begins</h1>
+          <p class="welcome-subtitle">Ask anything or pick an example prompt below to get started.</p>
+
+          <div class="example-prompts-grid">
+            <button class="prompt-card" data-prompt="Explain quantum computing in simple terms with an everyday analogy.">
+              <div class="prompt-title">Explain quantum computing</div>
+              <div class="prompt-desc">in simple terms with an everyday analogy</div>
+              <i class="fa-solid fa-arrow-right card-arrow"></i>
+            </button>
+
+            <button class="prompt-card" data-prompt="Write a Python script to scrape top news headlines and save them to JSON.">
+              <div class="prompt-title">Write a Python script</div>
+              <div class="prompt-desc">to scrape news headlines and export JSON</div>
+              <i class="fa-solid fa-arrow-right card-arrow"></i>
+            </button>
+
+            <button class="prompt-card" data-prompt="Help me brainstorm 5 unique startup ideas using AI in healthcare.">
+              <div class="prompt-title">Brainstorm startup ideas</div>
+              <div class="prompt-desc">using AI technology in healthcare</div>
+              <i class="fa-solid fa-arrow-right card-arrow"></i>
+            </button>
+
+            <button class="prompt-card" data-prompt="Write a professional email asking for a meeting with a project stakeholder.">
+              <div class="prompt-title">Write a professional email</div>
+              <div class="prompt-desc">asking for a stakeholder project meeting</div>
+              <i class="fa-solid fa-arrow-right card-arrow"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div class="chat-messages-container hidden" id="chatMessagesContainer">
+          <!-- Dynamically populated chat bubbles -->
+        </div>
+
+      </div>
+
+      <!-- Input Area Container -->
+      <div class="input-area-container">
+        <div class="input-wrapper">
+          <button class="stop-generating-btn hidden" id="stopGeneratingBtn">
+            <i class="fa-solid fa-square"></i>
+            <span>Stop generating</span>
+          </button>
+          
+          <div class="input-box-frame">
+            <textarea 
+              id="userPromptInput" 
+              placeholder="Message ChatGPT..." 
+              rows="1"
+              maxlength="8000"
+            ></textarea>
+            
+            <div class="input-actions">
+              <button class="send-btn" id="sendPromptBtn" disabled title="Send message">
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="disclaimer-text">
+          ChatGPT Clone can make mistakes. Consider checking important information.
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop hidden" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="icon-btn" id="closeSettingsBtn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="setting-group">
+          <label class="setting-label" for="systemPromptInput">System Persona / Prompt</label>
+          <select id="personaPresetSelect" class="preset-select">
+            <option value="default">Default ChatGPT (Helpful & Polite Assistant)</option>
+            <option value="coder">Senior Software Engineer & Code Architect</option>
+            <option value="concise">Concise & Direct Answerer</option>
+            <option value="creative">Creative Storyteller & Copywriter</option>
+          </select>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label" for="openaiKeyInput">OpenAI API Key (Optional)</label>
+          <input type="password" id="openaiKeyInput" placeholder="sk-..." class="setting-input">
+          <span class="setting-hint">If set, live queries using GPT-4o will connect directly to OpenAI API.</span>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label" for="geminiKeyInput">Gemini API Key (Optional)</label>
+          <input type="password" id="geminiKeyInput" placeholder="AIzaSy..." class="setting-input">
+          <span class="setting-hint">If set, live queries using Gemini 1.5 Pro will connect to Google Gemini API.</span>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label">Typing Speed (Simulated Streaming)</label>
+          <input type="range" id="typingSpeedInput" min="10" max="60" value="25" class="range-input">
+          <span class="setting-hint" id="speedDisplayValue">25 ms per token</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="resetSettingsBtn">Reset to Default</button>
+        <button class="btn btn-primary" id="saveSettingsBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+  <!-- Application Script -->
+  <script src="/static/app.js"></script>
+</body>
+</html>
